@@ -28,19 +28,19 @@
 #define SMOOTH     0xF7E817
 
 #include <WiFi.h>
+#include "credentials.h"
 // const char* ssid     = "xxx";          see credentials.ino
 // const char* password = "yyy";
 WiFiServer server(80);
 
 
 #include <IRremote.h>
-IRsend irsend;
+IRsend irsend;                       // ESP32 GPIO3 (DevKitC/WROOM32 pin 40)
 
 
 void setup()
 {
     Serial.begin(115200);
-    pinMode(5, OUTPUT);      // set the LED pin mode
 
     delay(10);
 
@@ -91,8 +91,7 @@ void loop(){
             client.println();
 
             // the content of the HTTP response follows the header:
-            client.print("Click <a href=\"/on\">here</a> to turn the LEDs on.<br>");
-            client.print("Click <a href=\"/off\">here</a> to turn the LEDs off.<br>");
+            client.print("Hic sunt dracones."); // security through obscurity (PoC only, don't do that!!!)
 
             // The HTTP response ends with another blank line:
             client.println();
@@ -107,10 +106,28 @@ void loop(){
 
         // Check to see if the client request was something
         if (currentLine.endsWith("GET /on")) {
-          irsend.sendNEC(0xF7C03F, 32);
+          sendCode(ON);
         }
         if (currentLine.endsWith("GET /off")) {
-          irsend.sendNEC(0xF740BF, 32);
+          sendCode(OFF);
+        }
+        if (currentLine.endsWith("GET /yellow")) {
+          sendCode(YELLOW);
+        }
+        if (currentLine.endsWith("GET /orange")) {
+          sendCode(ORANGE);
+        }
+        if (currentLine.endsWith("GET /white")) {
+          sendCode(WHITE);
+        }
+        if (currentLine.endsWith("GET /brighter")) {
+          sendCode(BRIGHTER);
+        }
+        if (currentLine.endsWith("GET /darker")) {
+          sendCode(DARKER);
+        }
+        if (currentLine.endsWith("GET /smooth")) {
+          sendCode(SMOOTH);
         }
       }
     }
@@ -119,3 +136,8 @@ void loop(){
     Serial.println("Client Disconnected.");
   }
 }
+
+void sendCode(int code) {
+  irsend.sendNEC(code, 32);
+}
+
