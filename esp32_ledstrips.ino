@@ -38,39 +38,50 @@ WiFiServer server(80);
 IRsend irsend;                       // ESP32 GPIO3 (DevKitC/WROOM32 pin 40)
 
 
-void setup()
-{
-    Serial.begin(115200);
+void setup() {
+  Serial.begin(115200);
+  delay(10);
 
-    delay(10);
-
-    // We start by connecting to a WiFi network
-
-    Serial.println();
-    Serial.println();
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
-
-    WiFi.begin(ssid, password);
-
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-
-    Serial.println("");
-    Serial.println("WiFi connected.");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-    
-    server.begin();
-
+  // We start by connecting to a WiFi network
+  wifiConnect();
 }
 
-int value = 0;
+void loop() {
+  serveClient();
 
-void loop(){
- WiFiClient client = server.available();   // listen for incoming clients
+  if(WiFi.status() != WL_CONNECTED) {
+    server.end();
+    wifiConnect();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+void wifiConnect() {
+  Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected.");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+  
+  server.begin();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+void serveClient(){
+  WiFiClient client = server.available();   // listen for incoming clients
 
   if (client) {                             // if you get a client,
     Serial.println("New Client.");           // print a message out the serial port
