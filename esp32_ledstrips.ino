@@ -65,9 +65,17 @@ void wifiConnect() {
 
   WiFi.begin(ssid, password);
 
+  int count = 0;
   while (WiFi.status() != WL_CONNECTED) {
       delay(500);
       Serial.print(".");
+      
+      count++;
+      if(count > 20) {
+        count = 0;
+        WiFi.begin();
+        Serial.println("#");
+      }
   }
 
   Serial.println("");
@@ -149,6 +157,8 @@ void serveClient(){
 }
 
 void sendCode(int code) {
+  Serial.print("## SEND ## ");
+  Serial.println(code);
   irsend.sendNEC(code, 32);
 }
 
