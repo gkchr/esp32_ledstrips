@@ -44,6 +44,9 @@ void setup() {
 
   // We start by connecting to a WiFi network
   wifiConnect();
+
+  pinMode(3, OUTPUT);
+  digitalWrite(3, LOW);
 }
 
 void loop() {
